@@ -26,14 +26,15 @@ public class PushBox extends SokobanAction implements PlanAction<Position2D> {
 	public List<Predicate<Position2D>> getPreconditions() {
 		List<Predicate<Position2D>> preConditions = new LinkedList<>();
 		path = level.searchPushPath(entity, id,value);
-		if(!path.thereIsPath())
+		if(path==null)
 			preConditions.add(new Predicate<Position2D>(PredicateType.NoSolution,"?","?",null));
 		else
 		{
-			for(Position2D[] pos : level.getNodes(path))
+			List<Position2D> positions = level.getNodes(path);
+			for(int i=0; i<positions.size(); i+=2)
 			{
-				preConditions.add(new Predicate<Position2D>(PredicateType.EntityAt,"Figure","0",pos[1]));
-				preConditions.add(new Predicate<Position2D>(PredicateType.ReadyToPush,"Box","0",pos[0]));
+				preConditions.add(new Predicate<Position2D>(PredicateType.EntityAt,"Figure","0",positions.get(i)));
+				preConditions.add(new Predicate<Position2D>(PredicateType.ReadyToPush,"Box",id,positions.get(i+1)));
 			}
 		}
 		
@@ -48,6 +49,11 @@ public class PushBox extends SokobanAction implements PlanAction<Position2D> {
 		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Box",id,path.getLastState().getState()));
 		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Figure","0",path.getBeforeLastState().getState()));
 		return effects;
+	}
+	
+	@Override
+	public void preformAction() {
+		level.removeEntity(entity, id);
 	}
 
 

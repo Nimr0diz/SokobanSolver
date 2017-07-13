@@ -5,7 +5,7 @@ import java.util.List;
 
 import commons.Direction2D;
 import model.Position2D;
-import model.entities.Box;
+import model.entities.Figure;
 import model.entities.SolidEntity;
 import model.levels.Level;
 import search.State;
@@ -29,7 +29,7 @@ public class BoxPathSearchable extends SokobanSearchable {
 			Position2D prevPos = new Position2D(s.getState());
 			se.getPolicy().getMovement().move(prevPos, dir.getOppositeDirection());
 			
-			if(level.getSolidEntity(nextPos)==null && level.getSolidEntity(prevPos)==null)
+			if((level.getSolidEntity(nextPos)==null && (level.getSolidEntity(prevPos)==null || level.getSolidEntity(prevPos) instanceof Figure)))
 			{
 				MoveAction action = new MoveAction(s,se, dir);
 				action.preformAction(s);

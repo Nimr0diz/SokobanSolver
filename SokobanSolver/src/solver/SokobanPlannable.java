@@ -1,5 +1,6 @@
 package solver;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,17 +9,15 @@ import model.entities.BoxTarget;
 import model.entities.SolidEntity;
 import model.levels.Level;
 import plan.AbstractAction;
+import plan.AbstractPlannable;
 import plan.Clause;
 import plan.Plannable;
 import plan.Predicate;
 import plan.PredicateType;
 
-public class SokobanPlannable implements Plannable<Position2D> {
+public class SokobanPlannable extends AbstractPlannable<Position2D> implements Plannable<Position2D> {
 	LevelSearcher level;
 	Level preLevel;
-	Clause<Position2D> goal;
-	List<Predicate<Position2D>> initialState;
-	Clause<Position2D> knowledgeBase;
 	
 	public SokobanPlannable(Level level) {
 		this.level = new LevelSearcher(level);
@@ -28,6 +27,21 @@ public class SokobanPlannable implements Plannable<Position2D> {
 		knowledgeBase = new Clause<>();
 		
 		initSokobanPlannable();
+	}
+	
+	public SokobanPlannable(SokobanPlannable plannable)
+	{
+		this.level = new LevelSearcher(plannable.level);
+		this.preLevel = new Level(plannable.preLevel);
+		this.goal = new Clause<Position2D>(plannable.goal);
+		this.initialState = new LinkedList<Predicate<Position2D>>(plannable.initialState);
+		this.knowledgeBase = new Clause<Position2D>(plannable.knowledgeBase);
+	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		SokobanPlannable plannable = new SokobanPlannable(this);
+		return plannable;
 	}
 	
 	public void initSokobanPlannable() {
@@ -66,23 +80,27 @@ public class SokobanPlannable implements Plannable<Position2D> {
 	}
 
 	@Override
-	public AbstractAction<Position2D> getActionForPredicate(Predicate<Position2D> p) {
+	public List<AbstractAction<Position2D>> getActionForPredicate(Predicate<Position2D> p) {
+		List<AbstractAction<Position2D>> actionList = new ArrayList<>();
 		if(p.getType()==PredicateType.EntityAt)
 		{
 			if(p.getEntity().equals("Box"))
 			{
-				return new PushBox(level, "0", p.getValue());
+				for(int i=0;i<level.getNumberOfBoxes();i++)
+				{
+					if(level.getEntity("Box",i+"")!=null)
+						actionList.add(new PushBox(level, i+"", p.getValue()));
+				}
 			}
 			else if(p.getEntity().equals("Figure"))
 			{
-				return new MoveFigure(level, "0", p.getValue());
+				actionList.add(new MoveFigure(level, "0", p.getValue()));
 			}
-			else
-				return null;
 		}
 		else if(p.getType()==PredicateType.ReadyToPush)
-			return new SimplePushBox(level, "0", p.getValue());
-		else return null;
+			actionList.add(new SimplePushBox(level, p.getId(), p.getValue()));
+		
+		return actionList;
 	}
 
 }

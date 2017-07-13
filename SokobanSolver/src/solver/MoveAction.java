@@ -32,11 +32,10 @@ public class MoveAction implements Action<Position2D> {
 		resultState = new State<Position2D>(newPos);
 		resultState.setCameFrom(originalState);
 		resultState.setActionCameFrom(this);
-		resultState.setCost(originalState.getCost()+getCost());
 		if(s.getActionCameFrom()!=null)
 			if(((MoveAction)s.getActionCameFrom()).getDirection()!=direction)
 				cost=3;
-		
+		resultState.setCost(originalState.getCost()+getCost());
 	}
 
 	@Override

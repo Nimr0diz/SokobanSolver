@@ -21,10 +21,10 @@ public class MoveFigure extends SokobanAction implements PlanAction<Position2D> 
 	public List<Predicate<Position2D>> getPreconditions() {
 		List<Predicate<Position2D>> preConditions = new LinkedList<>();
 		path = level.searchMovePath(id,value);
-		if(!path.thereIsPath())
+		if(path==null)
 			preConditions.add(new Predicate<Position2D>(PredicateType.NoSolution,"?","?",null));
-		else
-			level.updatePosition(entity, id, value);
+		//else
+		//	level.updatePosition(entity, id, value);
 		return preConditions;
 	}
 

@@ -32,7 +32,17 @@ public class LevelSearcher {
 		numberOfFigures = 0;
 		//initLevelSearcher();
 	}
-
+	
+	public LevelSearcher(LevelSearcher levelSearcher)
+	{
+		this.level = new Level(levelSearcher.level);
+		this.strToEntity = new HashMap<>(levelSearcher.strToEntity);
+		this.entityToStr = new HashMap<>(levelSearcher.entityToStr);
+		numberOfWalls = levelSearcher.numberOfWalls;
+		numberOfBoxes= levelSearcher.numberOfBoxes;
+		numberOfFigures= levelSearcher.numberOfFigures;
+	}
+	
 	private void initLevelSearcher() {
 		
 	}
@@ -57,33 +67,36 @@ public class LevelSearcher {
 	{
 		SolidEntity se = strToEntity.get(entity+" "+id);
 		level.removeSolidEntity(se.getPosition());
-		se.setPosition(dest);
+		se.setPosition(new Position2D(dest));
 		level.addEntity(se);
+		strToEntity.replace(entity+" "+id,se);
 	}
 	
-	public List<Position2D[]> getNodes(Path<Position2D> path)
+	public List<Position2D> getNodes(Path<Position2D> path)
 	{
 		List<Position2D[]> list = new LinkedList<>();
 		List<Action<Position2D>> actions = path.getActions(); 
 		List<State<Position2D>> states = path.getStates();
+		List<Position2D> positions = new LinkedList<Position2D>();
+		Position2D firstFigPos =  new Position2D(path.getFirstState().getState());
+		firstFigPos.move(((MoveAction)(actions.get(0))).getDirection().getOppositeDirection(), 1);
+		positions.add(firstFigPos);
 		for(int i=1;i<actions.size();i++)
 		{
 			MoveAction act = ((MoveAction)actions.get(i));
 			if(act.getDirection()!=((MoveAction)actions.get(i-1)).getDirection())
 			{
-				Position2D[] node = new Position2D[2];
-				node[0] = states.get(i).getState();
-				Position2D figPos= new Position2D(node[0]);
+				//Position2D[] node = new Position2D[2];
+				positions.add(states.get(i).getState());
+				Position2D figPos= new Position2D(states.get(i).getState());
 				figPos.move(act.getDirection().getOppositeDirection(), 1);
-				node[1] = figPos;
-				list.add(node);
+				//node[1] = figPos;
+				positions.add(figPos);
 			}
 		}
-		Position2D[] node = new Position2D[2];
-		node[0] = path.getLastState().getState();
-		node[1] = path.getBeforeLastState().getState();
-		list.add(node);
-		return list;
+		positions.add(path.getLastState().getState());
+		
+		return positions;
 		
 	}
 	
@@ -105,6 +118,19 @@ public class LevelSearcher {
 	
 	public SolidEntity getEntity(String entity, String id)
 	{
-		return strToEntity.get(entity+id);
+		return strToEntity.get(entity+" "+id);
+	}
+	
+	public void removeEntity(String entity, String id)
+	{
+		SolidEntity se = strToEntity.get(entity+" "+id);
+//		level.removeSolidEntity(se.getPosition());
+		entityToStr.remove(se);
+		strToEntity.remove(entity+" "+id);
+	}
+	
+	public int getNumberOfBoxes()
+	{
+		return numberOfBoxes;
 	}
 }

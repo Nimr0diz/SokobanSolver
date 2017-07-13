@@ -23,8 +23,8 @@ public class SimplePushBox extends SokobanAction implements PlanAction<Position2
 		path = level.searchPushPath(entity, id, value);
 		if(!path.thereIsPath())
 			preConditions.add(new Predicate<Position2D>(PredicateType.NoSolution,"?","?",null));
-		else
-			level.updatePosition(entity, id, value);
+		//else
+		//	level.updatePosition(entity, id, value);
 		return preConditions;
 	}
 
@@ -36,6 +36,12 @@ public class SimplePushBox extends SokobanAction implements PlanAction<Position2
 		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Box",id,path.getLastState().getState()));
 		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Figure","0",path.getBeforeLastState().getState()));
 		return effects;
+	}
+	
+	@Override
+	public void preformAction() {
+		level.updatePosition(entity, id, value);
+		level.updatePosition("Figure", "0", path.getBeforeLastState().getState());
 	}
 
 
