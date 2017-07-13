@@ -1,23 +1,23 @@
 package plan;
 
 public class Predicate<T> {
-	String type;
-	String entity;
-	String id;
-	T value;
+	protected PredicateType type;
+	protected String entity;
+	protected String id;
+	protected T value;
 	
-	public Predicate(String type,String entity, String id, T value) {
+	public Predicate(PredicateType type,String entity, String id, T value) {
 		this.type = type;
 		this.entity = entity;
 		this.id = id;
 		this.value = value;
 	}
 
-	public String getType() {
+	public PredicateType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(PredicateType type) {
 		this.type = type;
 	}
 	
@@ -52,7 +52,17 @@ public class Predicate<T> {
 	
 	public boolean satisfies(Predicate<T> p)
 	{
-		return false;
+		return type==p.type && entity.equals(p.entity) && value.equals(p.value);
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		Predicate<T> p = (Predicate<T>)obj;
+		return type==p.type && entity.equals(p.entity) && value.equals(p.value);
+	}
+	
+	@Override
+	public String toString() {
+		return type.name()+"="+entity+" "+id+","+value;
+	}
 }

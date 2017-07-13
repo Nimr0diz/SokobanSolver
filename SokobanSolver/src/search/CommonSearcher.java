@@ -9,18 +9,22 @@ public abstract class CommonSearcher<T> implements Searcher<T>{
 	int nodesEvaluated;
 	//PriorityQueue<State<T>> open;
 
-	public List<Action<T>> backTrace(State<T> s){
-		List<Action<T>> path= new LinkedList<Action<T>>();
+	public Path<T> backTrace(State<T> s){
+		List<Action<T>> actions= new LinkedList<>();
+		List<State<T>> states = new LinkedList<>();
 		State<T> state=s;
 		
 		while(state.getCameFrom()!=null)
 		{
-			path.add(state.getActionCameFrom());
+			actions.add(state.getActionCameFrom());
+			states.add(state);
 			state=state.getCameFrom();
 			nodesEvaluated++;
 		}
-		Collections.reverse(path);
-		return path;
+		Collections.reverse(actions);
+		Collections.reverse(states);
+		
+		return new Path<T>(actions,states);
 	}
 
 	@Override

@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface Searcher<T> {
 
-	List<Action<T>> search(Searchable<T> s);
+	Path<T> search(Searchable<T> s);
 	int getNumberOfNodesEvaluated();
 }

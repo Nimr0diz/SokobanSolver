@@ -23,12 +23,13 @@ public class Plan<T> {
 		StringBuilder sb = new StringBuilder("");
 		for(PlanAction<T> pa : plan)
 		{
-			for(Action<T> a : pa.getPlayerActions())
+			sb.append("["+pa.toString()+"] ");
+			for(Action<T> a : pa.getPlayerActions().getActions())
 			{
 				sb.append(a);
-				sb.append("\n");	
+				sb.append("|");	
 			}
-			sb.append("-----------\n");
+			sb.append("  -$-  ");
 			
 		}
 		return sb.toString();

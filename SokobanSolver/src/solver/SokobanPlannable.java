@@ -3,90 +3,85 @@ package solver;
 import java.util.LinkedList;
 import java.util.List;
 
-import fail.AndPredicate;
-import fail.IPredicate;
-import model.entities.Box;
+import model.Position2D;
 import model.entities.BoxTarget;
-import model.entities.Figure;
 import model.entities.SolidEntity;
 import model.levels.Level;
-import plan.KnowledgeBase;
-import plan.PlanAction;
+import plan.AbstractAction;
+import plan.Clause;
 import plan.Plannable;
-import model.Position2D;
+import plan.Predicate;
+import plan.PredicateType;
 
-public class SokobanPlannable implements Plannable<SolidEntity> {
-	Level level;
-	AndPredicate goal;
-	List<IPredicate> initialState;
-	KnowledgeBase knowledgeBase;
+public class SokobanPlannable implements Plannable<Position2D> {
+	LevelSearcher level;
+	Level preLevel;
+	Clause<Position2D> goal;
+	List<Predicate<Position2D>> initialState;
+	Clause<Position2D> knowledgeBase;
 	
 	public SokobanPlannable(Level level) {
-		this.level = level;
+		this.level = new LevelSearcher(level);
+		preLevel = level;
+		initialState = new LinkedList<Predicate<Position2D>>();
+		goal = new Clause<>();
+		knowledgeBase = new Clause<>();
+		
 		initSokobanPlannable();
 	}
 	
 	public void initSokobanPlannable() {
-		IPredicate[] predicateGoal = new IPredicate[level.getBoxesLeft()];
-		initialState = new LinkedList<IPredicate>();
-		knowledgeBase = new KnowledgeBase();
-		int i = 0;
-		for(BoxTarget bt: level.getField().getBoxTargetList())
+		
+		for(SolidEntity se : preLevel.getSolidArray())
 		{
-			predicateGoal[i++] = new BoxAtPredicate(bt.getPosition());
-			initialState.add(new BoxTargetAtPredicate(bt.getPosition()));
-			knowledgeBase.add(new BoxTargetAtPredicate(bt.getPosition()));
+			String str = level.addEntity(se);
+			Predicate<Position2D> p = new Predicate<Position2D>(PredicateType.EntityAt, str.substring(0, str.indexOf(" ")),str.substring(1+str.indexOf(" ")) , se.getPosition());
+			initialState.add(p);
+			knowledgeBase.add(p);
 		}
 		
-		for(Box b : level.getField().getBoxList())
-		{
-			initialState.add(new BoxAtPredicate(b.getPosition()));
-			knowledgeBase.add(new BoxAtPredicate(b.getPosition()));
-		}
-		
-		Figure f = level.getFirstFigure();
-		initialState.add(new FigureAtPredicate(f.getPosition()));
-		knowledgeBase.add(new FigureAtPredicate(f.getPosition()));
-		
-		this.goal = new AndPredicate(predicateGoal);
+		for(BoxTarget bt: preLevel.getField().getBoxTargetList())
+			goal.add(new Predicate<Position2D>(PredicateType.EntityAt, "Box", "?", bt.getPosition()));
 		
 	}
 
 	@Override
-	public AndPredicate getGoal() {
+	public Clause<Position2D> getGoal() {
 		return goal;
 	}
 
 	@Override
-	public List<IPredicate> getInitialState() {
+	public List<Predicate<Position2D>> getInitialState() {
 		return initialState;
 	}
 
 	@Override
-	public KnowledgeBase getKnowledgeBase() {
+	public Clause<Position2D> getKnowledgeBase() {
 		return knowledgeBase;
 	}
 
 	@Override
-	public List<SolidEntity> getAllEntities() {
-		return null;
+	public boolean isSatisfied(Predicate<Position2D> p) {
+		return knowledgeBase.isStaisfy(p);
 	}
 
 	@Override
-	public boolean isSatisfied(IPredicate p) {
-		return knowledgeBase.isContain(p);
-	}
-
-	@Override
-	public PlanAction getActionForPredicate(IPredicate p) {
-		if(p instanceof BoxAtPredicate)
+	public AbstractAction<Position2D> getActionForPredicate(Predicate<Position2D> p) {
+		if(p.getType()==PredicateType.EntityAt)
 		{
-			return new PushBox(level,level.getField().getBoxList().get(0),(Position2D)(p.getParams())[0]);
+			if(p.getEntity().equals("Box"))
+			{
+				return new PushBox(level, "0", p.getValue());
+			}
+			else if(p.getEntity().equals("Figure"))
+			{
+				return new MoveFigure(level, "0", p.getValue());
+			}
+			else
+				return null;
 		}
-		else if(p instanceof FigureAtPredicate)
-		{
-			return new MoveFigure(level,level.getFirstFigure(),(Position2D)(p.getParams())[0]);
-		}
+		else if(p.getType()==PredicateType.ReadyToPush)
+			return new SimplePushBox(level, "0", p.getValue());
 		else return null;
 	}
 

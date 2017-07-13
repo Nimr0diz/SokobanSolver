@@ -23,5 +23,8 @@ public class SokobanPredicate extends Predicate<Position2D> {
 				( type.equals(p.type) && entity.equals(p.entity) && p.equals("?") && value.equals(p.value) ); //Generic Predicate
 	}
 	
-	
+	@Override
+	public int hashCode() {
+		return (type+" "+entity+" "+value.getX()+" "+value.getY()).hashCode();
+	}
 }

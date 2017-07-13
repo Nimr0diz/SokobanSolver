@@ -2,46 +2,42 @@ package solver;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
-import fail.AndPredicate;
-import fail.IPredicate;
-import fail.NotPredicate;
 import model.Position2D;
-import model.entities.Box;
-import model.entities.Figure;
-import model.levels.Level;
+import plan.Clause;
 import plan.PlanAction;
-import search.Action;
-import search.BFS;
+import plan.Predicate;
+import plan.PredicateType;
 
-public class MoveFigure extends CommonAction implements PlanAction<Position2D> {
+public class MoveFigure extends SokobanAction implements PlanAction<Position2D> {
 
-	public MoveFigure(Level level, Figure figure, Position2D position) {
-		super(3);
-		params[0] = level;
-		params[1] = figure;
-		params[2] = position;
+	
+	public MoveFigure(LevelSearcher level, String id, Position2D value) {
+		super(level, PredicateType.Move, "Figure", id, value);
+
 	}
 
 	@Override
-	public boolean isAtomic() {
-		return false;
-	}
-
-	@Override
-	public List<IPredicate> getPreconditions() {
-		List<IPredicate> preConditions = new LinkedList<IPredicate>();
-		FigurePathSearchable searchable = new FigurePathSearchable((Level)params[0], (Figure)params[1], (Position2D)params[2]);
-		playerActions = new BFS().search(searchable);
-		preConditions.add(new NotPredicate(new BoxAtPredicate((Position2D)params[2])));
+	public List<Predicate<Position2D>> getPreconditions() {
+		List<Predicate<Position2D>> preConditions = new LinkedList<>();
+		path = level.searchMovePath(id,value);
+		if(!path.thereIsPath())
+			preConditions.add(new Predicate<Position2D>(PredicateType.NoSolution,"?","?",null));
+		else
+			level.updatePosition(entity, id, value);
 		return preConditions;
 	}
 
 	@Override
-	public AndPredicate getEffect() {
-		return new AndPredicate(new FigureAtPredicate((Position2D)params[2]),new NotPredicate(new FigureAtPredicate(((Figure)params[1]).getPosition())));
+	public Clause<Position2D> getEffect() {
+		Clause<Position2D> effects = new Clause<>();
+		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Nothing","?",path.getFirstState().getState()));
+		effects.add(new Predicate<Position2D>(PredicateType.EntityAt,"Figure",id,path.getBeforeLastState().getState()));
+		return effects;
 	}
+
+
+
 
 
 }

@@ -1,19 +1,18 @@
 package plan;
 
 import java.util.List;
-import java.util.PriorityQueue;
 
-import fail.AndPredicate;
-import fail.IPredicate;
-import search.Action;
+import search.Path;
 
 public interface PlanAction<T> {
 
-	List<IPredicate> getPreconditions();
+	 List<Predicate<T>> getPreconditions();
 	
-	AndPredicate getEffect();
+	 Clause<T> getEffect();
 
-	List<Action<T>> getPlayerActions();
+	 Path<T> getPlayerActions();
+	
+	 void preformAction();
 	
 	
 

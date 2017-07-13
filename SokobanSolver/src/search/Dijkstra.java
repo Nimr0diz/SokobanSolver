@@ -12,7 +12,7 @@ public class Dijkstra<T extends Comparable<T>> extends CommonSearcher<T> {
 	}
 	
 	@Override
-	public List<Action<T>> search(Searchable<T> s) {
+	public Path<T> search(Searchable<T> s) {
 
 		State<T> initialState = s.getInitialState();
 		State<T> goalState = s.getGoalState();

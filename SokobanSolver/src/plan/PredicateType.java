@@ -1,5 +1,5 @@
 package plan;
 
 public enum PredicateType {
-	EntityAt
+	EntityAt,ReadyToPush,Push,SimplePush,Move,NoSolution
 }

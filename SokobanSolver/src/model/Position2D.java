@@ -84,4 +84,10 @@ public class Position2D implements Position<Direction2D>{
 	{
 		return new CommonPosition(x,y);
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "("+x+","+y+")";
+	}
 }

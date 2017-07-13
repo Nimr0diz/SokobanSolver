@@ -20,8 +20,8 @@ public class Boot {
 	{
 		String[] Args = {"D:\\level2.txt","D:\\output.txt"};
 		Level level = new MyTextLevelLoader().loadLevel(new FileInputStream(Args[0]));
-		Plannable<SolidEntity> sokSolver = new SokobanPlannable(level);
-		Plan plan = new Strips<SolidEntity,Position2D>().plan(sokSolver);
+		Plannable<Position2D> sokSolver = new SokobanPlannable(level);
+		Plan<Position2D> plan = new Strips<Position2D>().plan(sokSolver);
 		BufferedWriter bw = new BufferedWriter(new FileWriter(Args[1]));
 		bw.write(plan.toString());
 		bw.flush();

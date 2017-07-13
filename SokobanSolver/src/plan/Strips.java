@@ -1,22 +1,24 @@
 package plan;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
-import fail.AndPredicate;
-import fail.IPredicate;
-import fail.NotPredicate;
-
-public class Strips<E,T> implements Planner<E> {
+public class Strips<T> implements Planner<T> {
 
 	@Override
-	public Plan plan(Plannable<E> plannable) {
-		Plan plan = new Plan();
-		Stack<Predicate> stack = new Stack<Predicate>();
-		KnowledgeBase knowledgebase = plannable.getKnowledgeBase();
-		stack.push(plannable.getGoal());
+	public Plan<T> plan(Plannable<T> plannable) {
+		Plan<T> plan = new Plan<T>();
+		Stack<Predicate<T>> stack = new Stack<Predicate<T>>();
+		Clause<T> knowledgebase = plannable.getKnowledgeBase();
+		for(Predicate<T> goal : plannable.getGoal().getSet())
+			stack.push(goal);
 		while(!stack.isEmpty())
 		{
-			Predicate top = stack.pop();
+			Predicate<T> top = stack.pop();
 			/*if(top instanceof AndPredicate)
 			{
 				for(Object o:top.getParams())
@@ -29,39 +31,40 @@ public class Strips<E,T> implements Planner<E> {
 					stack.push((IPredicate)o);
 				}
 			}*/
-			if(top instanceof PlanAction)
+			if(top instanceof AbstractAction)
 			{
-				PlanAction<T> action = (PlanAction<T>)top;
-				if(top.isSatisfied())
+				AbstractAction<T> action = (AbstractAction<T>)top;
+				plan.add(action);
+				action.preformAction();
+				Set<Predicate<T>> kbs = new HashSet<Predicate<T>>(knowledgebase.getSet());
+				for(Predicate<T> effect : action.getEffect().getSet())
 				{
-					plan.add(action);
-					knowledgebase.add(action.getEffect());
-				}
-				else
-				{
-					stack.push(top);
-					for(IPredicate p:action.getPreconditions())
+					for(Predicate<T> kb : kbs)
 					{
-						//System.out.println(p.equals();
-						p.setSatisfied(plannable.isSatisfied(p));
-						stack.push(p);
+						if(kb.contradicts(effect))
+							knowledgebase.remove(kb);
 					}
+					knowledgebase.add(effect);
 				}
-			}
-			else if(top instanceof NotPredicate)
-			{
-				IPredicate pre = (IPredicate)(((NotPredicate)top).params[0]);
-				pre.setSatisfied(plannable.isSatisfied(pre));
-				stack.push(new NotPredicate(pre));
 			}
 			else
 			{
 				boolean satisfy = plannable.isSatisfied(top);
 				if(!satisfy)
 				{
-					PlanAction<T> action = plannable.getActionForPredicate(top);
-					action.setSatisfied(satisfy);
+					AbstractAction<T> action = plannable.getActionForPredicate(top);
+					if(action==null)
+					{
+						plan = new Plan<T>();
+						stack.removeAllElements();
+					}
 					stack.push(action);
+					List<Predicate<T>> preConditions = new LinkedList<Predicate<T>>(action.getPreconditions());
+					Collections.reverse(preConditions);
+					for(int i=preConditions.size()-1;i>=0;i--)
+					{
+						stack.push(preConditions.get(i));
+					}
 				}
 			}
 		}

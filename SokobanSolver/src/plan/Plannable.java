@@ -1,17 +1,13 @@
 package plan;
 
 import java.util.List;
-import java.util.Map;
 
-import fail.AndPredicate;
-import fail.IPredicate;
+public interface Plannable<T> {
 
-public interface Plannable<E> {
-
-	AndPredicate getGoal();
-	List<IPredicate> getInitialState();
-	KnowledgeBase getKnowledgeBase();
-	List<E> getAllEntities();
-	PlanAction getActionForPredicate(IPredicate p);
-	boolean isSatisfied(IPredicate p);
+	Clause<T> getGoal();
+	List<Predicate<T>> getInitialState();
+	Clause<T> getKnowledgeBase();
+	//List<T> getAllEntities();
+	AbstractAction<T> getActionForPredicate(Predicate<T> p);
+	boolean isSatisfied(Predicate<T> p);
 }
