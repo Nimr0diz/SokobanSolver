@@ -2,6 +2,10 @@ package plan;
 
 import java.util.Stack;
 
+import fail.AndPredicate;
+import fail.IPredicate;
+import fail.NotPredicate;
+
 public class Strips<E,T> implements Planner<E> {
 
 	@Override
@@ -13,19 +17,19 @@ public class Strips<E,T> implements Planner<E> {
 		while(!stack.isEmpty())
 		{
 			Predicate top = stack.pop();
-			if(top instanceof AndPredicate)
+			/*if(top instanceof AndPredicate)
 			{
 				for(Object o:top.getParams())
 				{
-					Predicate p = (Predicate)(o);
+					IPredicate p = (IPredicate)(o);
 					if(p instanceof NotPredicate)
 					{
-						knowledgebase.remove((Predicate)(p.getParams()[0]));
+						knowledgebase.remove((IPredicate)(p.getParams()[0]));
 					}
-					stack.push((Predicate)o);
+					stack.push((IPredicate)o);
 				}
-			}
-			else if(top instanceof PlanAction)
+			}*/
+			if(top instanceof PlanAction)
 			{
 				PlanAction<T> action = (PlanAction<T>)top;
 				if(top.isSatisfied())
@@ -36,8 +40,9 @@ public class Strips<E,T> implements Planner<E> {
 				else
 				{
 					stack.push(top);
-					for(Predicate p:action.getPreconditions())
+					for(IPredicate p:action.getPreconditions())
 					{
+						//System.out.println(p.equals();
 						p.setSatisfied(plannable.isSatisfied(p));
 						stack.push(p);
 					}
@@ -45,7 +50,7 @@ public class Strips<E,T> implements Planner<E> {
 			}
 			else if(top instanceof NotPredicate)
 			{
-				Predicate pre = (Predicate)(((NotPredicate)top).params[0]);
+				IPredicate pre = (IPredicate)(((NotPredicate)top).params[0]);
 				pre.setSatisfied(plannable.isSatisfied(pre));
 				stack.push(new NotPredicate(pre));
 			}

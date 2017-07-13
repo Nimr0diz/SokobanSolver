@@ -1,10 +1,10 @@
 package solver;
 
+import fail.CommonPredicate;
+import fail.IPredicate;
 import model.Position2D;
-import plan.CommonPredicate;
-import plan.Predicate;
 
-public class BoxTargetAtPredicate extends CommonPredicate implements Predicate {
+public class BoxTargetAtPredicate extends CommonPredicate implements IPredicate {
 	
 	public BoxTargetAtPredicate(Position2D position) {
 		super(1);

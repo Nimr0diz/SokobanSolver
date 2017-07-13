@@ -1,29 +1,32 @@
 package plan;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
-public class KnowledgeBase {
+import fail.IPredicate;
 
-	HashSet<Predicate> hs;
+public class KnowledgeBase<T> {
+
+	HashMap<PredicateType,Predicate<T>> hm;
 	
 	public KnowledgeBase() {
-		hs=new HashSet<Predicate>();
+		hm=new HashMap<PredicateType,Predicate<T>>();
 	}
 	
-	public boolean isContain(Predicate p)
+	public boolean isContain(Predicate<T> p)
 	{
-		if(p==null) return false;
-		return hs.contains(p);
+		if(hm.get(p)==null) return false;
+		return true;
 	}
 	
-	public void add(Predicate p)
+	public void add(Predicate<T> p)
 	{
-		hs.add(p);
+		hm.put(p.type,p);
 	}
 	
-	public void remove(Predicate p)
+	public void remove()
 	{
 		if(isContain(p))
-			hs.remove(p);
+			hm.remove(p);
 	}
 }

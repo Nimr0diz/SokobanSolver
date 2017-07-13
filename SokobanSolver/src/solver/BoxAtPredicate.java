@@ -1,7 +1,7 @@
 package solver;
 
+import fail.CommonPredicate;
 import model.Position2D;
-import plan.CommonPredicate;
 
 public class BoxAtPredicate extends CommonPredicate {
 

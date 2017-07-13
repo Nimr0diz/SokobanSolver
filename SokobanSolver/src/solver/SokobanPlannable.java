@@ -3,22 +3,22 @@ package solver;
 import java.util.LinkedList;
 import java.util.List;
 
+import fail.AndPredicate;
+import fail.IPredicate;
 import model.entities.Box;
 import model.entities.BoxTarget;
 import model.entities.Figure;
 import model.entities.SolidEntity;
 import model.levels.Level;
-import plan.AndPredicate;
 import plan.KnowledgeBase;
 import plan.PlanAction;
 import plan.Plannable;
-import plan.Predicate;
 import model.Position2D;
 
 public class SokobanPlannable implements Plannable<SolidEntity> {
 	Level level;
 	AndPredicate goal;
-	List<Predicate> initialState;
+	List<IPredicate> initialState;
 	KnowledgeBase knowledgeBase;
 	
 	public SokobanPlannable(Level level) {
@@ -27,8 +27,8 @@ public class SokobanPlannable implements Plannable<SolidEntity> {
 	}
 	
 	public void initSokobanPlannable() {
-		Predicate[] predicateGoal = new Predicate[level.getBoxesLeft()];
-		initialState = new LinkedList<Predicate>();
+		IPredicate[] predicateGoal = new IPredicate[level.getBoxesLeft()];
+		initialState = new LinkedList<IPredicate>();
 		knowledgeBase = new KnowledgeBase();
 		int i = 0;
 		for(BoxTarget bt: level.getField().getBoxTargetList())
@@ -58,7 +58,7 @@ public class SokobanPlannable implements Plannable<SolidEntity> {
 	}
 
 	@Override
-	public List<Predicate> getInitialState() {
+	public List<IPredicate> getInitialState() {
 		return initialState;
 	}
 
@@ -73,12 +73,12 @@ public class SokobanPlannable implements Plannable<SolidEntity> {
 	}
 
 	@Override
-	public boolean isSatisfied(Predicate p) {
+	public boolean isSatisfied(IPredicate p) {
 		return knowledgeBase.isContain(p);
 	}
 
 	@Override
-	public PlanAction getActionForPredicate(Predicate p) {
+	public PlanAction getActionForPredicate(IPredicate p) {
 		if(p instanceof BoxAtPredicate)
 		{
 			return new PushBox(level,level.getField().getBoxList().get(0),(Position2D)(p.getParams())[0]);

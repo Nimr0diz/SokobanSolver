@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import fail.AndPredicate;
+import fail.IPredicate;
+import fail.NotPredicate;
 import model.Position2D;
 import model.entities.Box;
 import model.entities.Figure;
 import model.levels.Level;
-import plan.AndPredicate;
-import plan.NotPredicate;
 import plan.PlanAction;
-import plan.Predicate;
 import search.Action;
 import search.BFS;
 
@@ -30,8 +30,8 @@ public class MoveFigure extends CommonAction implements PlanAction<Position2D> {
 	}
 
 	@Override
-	public List<Predicate> getPreconditions() {
-		List<Predicate> preConditions = new LinkedList<Predicate>();
+	public List<IPredicate> getPreconditions() {
+		List<IPredicate> preConditions = new LinkedList<IPredicate>();
 		FigurePathSearchable searchable = new FigurePathSearchable((Level)params[0], (Figure)params[1], (Position2D)params[2]);
 		playerActions = new BFS().search(searchable);
 		preConditions.add(new NotPredicate(new BoxAtPredicate((Position2D)params[2])));

@@ -1,8 +1,8 @@
-package plan;
+package fail;
 
 import java.util.PriorityQueue;
 
-public abstract class CommonPredicate implements Predicate{
+public abstract class CommonPredicate implements IPredicate{
 	protected Object[] params;
 	boolean satisfied;
 	
@@ -32,17 +32,17 @@ public abstract class CommonPredicate implements Predicate{
 	
 	@Override
 	public boolean equals(Object obj) {
-		Predicate p = (Predicate)obj;
+		IPredicate p = (IPredicate)obj;
 		if(this.getClass().equals(p.getClass()))
 			if(p.getParams().length == params.length)
 			{
 				for(int i=0;i<params.length;i++)
 				{
 					if(!params[i].equals(p.getParams()[i]))
-						return true;
+						return false;
 				}
 			}
-		return false;
+		return true;
 	}
 	
 	@Override

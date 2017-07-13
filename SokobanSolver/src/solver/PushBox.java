@@ -6,12 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import fail.AndPredicate;
+import fail.IPredicate;
 import model.Position2D;
 import model.entities.Box;
 import model.levels.Level;
-import plan.AndPredicate;
 import plan.PlanAction;
-import plan.Predicate;
 import search.Action;
 import search.BFS;
 import search.Searcher;
@@ -32,8 +32,8 @@ public class PushBox extends CommonAction implements PlanAction<Position2D> {
 	}
 
 	@Override
-	public List<Predicate> getPreconditions() {
-		List<Predicate> preConditions = new LinkedList<Predicate>();
+	public List<IPredicate> getPreconditions() {
+		List<IPredicate> preConditions = new LinkedList<IPredicate>();
 		BoxPathSearchable searchable = new BoxPathSearchable((Level)params[0], (Box)params[1], (Position2D)params[2]);
 		Searcher<Position2D> searcher = new BFS<Position2D>();
 		playerActions = searcher.search(searchable);

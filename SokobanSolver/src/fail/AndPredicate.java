@@ -1,8 +1,8 @@
-package plan;
+package fail;
 
-public class AndPredicate extends CommonPredicate implements Predicate{
+public class AndPredicate extends CommonPredicate implements IPredicate{
 	
-	public AndPredicate(Predicate... predicates) {
+	public AndPredicate(IPredicate... predicates) {
 		params = predicates;
 	}
 
@@ -15,7 +15,7 @@ public class AndPredicate extends CommonPredicate implements Predicate{
 	public boolean isSatisfied() {
 		boolean tempSatisfied = true;
 		for(Object o:params)
-			tempSatisfied = tempSatisfied && ((Predicate)o).isSatisfied();
+			tempSatisfied = tempSatisfied && ((IPredicate)o).isSatisfied();
 		
 		return tempSatisfied;
 	}
