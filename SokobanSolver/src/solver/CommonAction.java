@@ -1,13 +1,14 @@
 package solver;
 
-import java.util.PriorityQueue;
+import java.util.List;
 
-import plan.AndPredicate;
+import model.Position2D;
 import plan.PlanAction;
-import plan.Predicate;
+import search.Action;
 
-public abstract class CommonAction implements PlanAction {
+public abstract class CommonAction implements PlanAction<Position2D> {
 	Object[] params;
+	List<Action<Position2D>> playerActions;
 	boolean satisfied;
 	
 	public CommonAction(int size){
@@ -29,4 +30,10 @@ public abstract class CommonAction implements PlanAction {
 		satisfied = satisfy;
 		
 	}
+
+	public List<Action<Position2D>> getPlayerActions() {
+		return playerActions;
+	}
+	
+	
 }

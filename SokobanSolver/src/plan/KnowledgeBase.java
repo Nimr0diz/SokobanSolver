@@ -12,11 +12,18 @@ public class KnowledgeBase {
 	
 	public boolean isContain(Predicate p)
 	{
+		if(p==null) return false;
 		return hs.contains(p);
 	}
 	
 	public void add(Predicate p)
 	{
 		hs.add(p);
+	}
+	
+	public void remove(Predicate p)
+	{
+		if(isContain(p))
+			hs.remove(p);
 	}
 }

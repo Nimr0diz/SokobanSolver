@@ -1,5 +1,6 @@
 package search;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -18,9 +19,10 @@ public abstract class CommonSearcher<T> implements Searcher<T>{
 			state=state.getCameFrom();
 			nodesEvaluated++;
 		}
+		Collections.reverse(path);
 		return path;
 	}
-	
+
 	@Override
 	public int getNumberOfNodesEvaluated() {
 		// TODO Auto-generated method stub

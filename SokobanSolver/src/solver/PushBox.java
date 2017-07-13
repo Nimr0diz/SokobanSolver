@@ -1,5 +1,8 @@
 package solver;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -11,45 +14,60 @@ import plan.PlanAction;
 import plan.Predicate;
 import search.Action;
 import search.BFS;
+import search.Searcher;
 
-public class PushBox extends CommonAction implements PlanAction {
-
+public class PushBox extends CommonAction implements PlanAction<Position2D> {
+	Position2D lastPosition;
 	public PushBox(Level level,Box box, Position2D position2d) {
 		super(3);
 		params[0] = level;
 		params[1] = box;
 		params[2] = position2d;
+		lastPosition = null;
 	}
-
+	
 	@Override
 	public boolean isAtomic() {
 		return false;
 	}
 
 	@Override
-	public PriorityQueue<Predicate> getPreconditions() {
-		PriorityQueue<Predicate> preConditions = new PriorityQueue<Predicate>();
+	public List<Predicate> getPreconditions() {
+		List<Predicate> preConditions = new LinkedList<Predicate>();
 		BoxPathSearchable searchable = new BoxPathSearchable((Level)params[0], (Box)params[1], (Position2D)params[2]);
-		List<Action<Position2D>> path = new BFS().search(searchable);
+		Searcher<Position2D> searcher = new BFS<Position2D>();
+		playerActions = searcher.search(searchable);
 		
-		for(int i=1;i<path.size();i++)
+		MoveAction firstAct = (MoveAction)playerActions.get(0);
+		
+		Position2D node = new Position2D(firstAct.getOriginalState().getState());
+		Position2D figNode = new Position2D(firstAct.getOriginalState().getState());
+		figNode.move(firstAct.getDirection().getOppositeDirection(), 1);
+		preConditions.add(new FigureAtPredicate(figNode));
+		preConditions.add(new BoxAtPredicate(node));
+		
+		for(int i=1;i<playerActions.size();i++)
 		{
-			MoveAction act = (MoveAction)path.get(i);
-			if(act.equals(path.get(i-1)))
+			MoveAction act = (MoveAction)playerActions.get(i);
+			if(act.getDirection()!=((MoveAction)(playerActions.get(i-1))).getDirection())
 			{
-				Position2D node = act.getResultState().getState();
+				node = new Position2D(act.getOriginalState().getState());
+				figNode = new Position2D(act.getOriginalState().getState());
+				figNode.move(act.getDirection().getOppositeDirection(), 1);
+				preConditions.add(new FigureAtPredicate(figNode));
 				preConditions.add(new BoxAtPredicate(node));
-				node.move(act.getDirection().getOppositeDirection(), 1);
-				preConditions.add(new FigureAtPredicate(node));
+
 			}
 		}
+		
+		lastPosition = (Position2D)(playerActions.get(playerActions.size()-2).getOriginalState().getState());
+		Collections.reverse(preConditions);
 		return preConditions;
 	}
 
 	@Override
 	public AndPredicate getEffect() {
-		// TODO Auto-generated method stub
-		return null;
+		return new AndPredicate(new BoxAtPredicate((Position2D)params[2]),new FigureAtPredicate(lastPosition));
 	}
 
 

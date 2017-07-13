@@ -1,5 +1,6 @@
 package solver;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -8,12 +9,13 @@ import model.entities.Box;
 import model.entities.Figure;
 import model.levels.Level;
 import plan.AndPredicate;
+import plan.NotPredicate;
 import plan.PlanAction;
 import plan.Predicate;
 import search.Action;
 import search.BFS;
 
-public class MoveFigure extends CommonAction implements PlanAction {
+public class MoveFigure extends CommonAction implements PlanAction<Position2D> {
 
 	public MoveFigure(Level level, Figure figure, Position2D position) {
 		super(3);
@@ -28,30 +30,17 @@ public class MoveFigure extends CommonAction implements PlanAction {
 	}
 
 	@Override
-	public PriorityQueue<Predicate> getPreconditions() {
-		PriorityQueue<Predicate> preConditions = new PriorityQueue<Predicate>();
+	public List<Predicate> getPreconditions() {
+		List<Predicate> preConditions = new LinkedList<Predicate>();
 		FigurePathSearchable searchable = new FigurePathSearchable((Level)params[0], (Figure)params[1], (Position2D)params[2]);
-		List<Action<Position2D>> path = new BFS().search(searchable);
-		
-		for(int i=1;i<path.size();i++)
-		{
-			MoveAction act = (MoveAction)path.get(i);
-			if(act.equals(path.get(i-1)))
-			{
-				Position2D node = act.getResultState().getState();
-				preConditions.add(new BoxAtPredicate(node));
-				node.move(act.getDirection().getOppositeDirection(), 1);
-				preConditions.add(new FigureAtPredicate(node));
-			}
-		}
+		playerActions = new BFS().search(searchable);
+		preConditions.add(new NotPredicate(new BoxAtPredicate((Position2D)params[2])));
 		return preConditions;
-
 	}
 
 	@Override
 	public AndPredicate getEffect() {
-		// TODO Auto-generated method stub
-		return null;
+		return new AndPredicate(new FigureAtPredicate((Position2D)params[2]),new NotPredicate(new FigureAtPredicate(((Figure)params[1]).getPosition())));
 	}
 
 

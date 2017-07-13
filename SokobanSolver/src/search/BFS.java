@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class BFS<T extends Comparable<T>> extends CommonSearcher<T> {
+public class BFS<T> extends CommonSearcher<T> {
 	
 	public BFS() {
 	}

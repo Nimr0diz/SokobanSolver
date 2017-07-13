@@ -2,7 +2,7 @@ package plan;
 
 import java.util.Stack;
 
-public class Strips<E> implements Planner<E> {
+public class Strips<E,T> implements Planner<E> {
 
 	@Override
 	public Plan plan(Plannable<E> plannable) {
@@ -17,12 +17,17 @@ public class Strips<E> implements Planner<E> {
 			{
 				for(Object o:top.getParams())
 				{
+					Predicate p = (Predicate)(o);
+					if(p instanceof NotPredicate)
+					{
+						knowledgebase.remove((Predicate)(p.getParams()[0]));
+					}
 					stack.push((Predicate)o);
 				}
 			}
 			else if(top instanceof PlanAction)
 			{
-				PlanAction action = (PlanAction)top;
+				PlanAction<T> action = (PlanAction<T>)top;
 				if(top.isSatisfied())
 				{
 					plan.add(action);
@@ -38,18 +43,23 @@ public class Strips<E> implements Planner<E> {
 					}
 				}
 			}
+			else if(top instanceof NotPredicate)
+			{
+				Predicate pre = (Predicate)(((NotPredicate)top).params[0]);
+				pre.setSatisfied(plannable.isSatisfied(pre));
+				stack.push(new NotPredicate(pre));
+			}
 			else
 			{
 				boolean satisfy = plannable.isSatisfied(top);
-				if(satisfy)
+				if(!satisfy)
 				{
-					PlanAction action = plannable.getActionForPredicate(top);
+					PlanAction<T> action = plannable.getActionForPredicate(top);
 					action.setSatisfied(satisfy);
 					stack.push(action);
 				}
 			}
 		}
-		
 		return plan;
 	}
 

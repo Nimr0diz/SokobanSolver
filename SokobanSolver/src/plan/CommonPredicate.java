@@ -30,4 +30,35 @@ public abstract class CommonPredicate implements Predicate{
 		
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		Predicate p = (Predicate)obj;
+		if(this.getClass().equals(p.getClass()))
+			if(p.getParams().length == params.length)
+			{
+				for(int i=0;i<params.length;i++)
+				{
+					if(!params[i].equals(p.getParams()[i]))
+						return true;
+				}
+			}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		String hash = this.getClass().toString();
+		for(Object o : params)
+			hash+=" "+o.hashCode();
+		return hash.hashCode();
+	}
+	
+	public String hashCodeString()
+	{
+		String hash = this.getClass().toString();
+		for(Object o : params)
+			hash+=" "+o.hashCode();
+		return hash;
+	}
+	
 }

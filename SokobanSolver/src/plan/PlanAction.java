@@ -3,12 +3,15 @@ package plan;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public interface PlanAction extends Predicate{
+import search.Action;
 
-	PriorityQueue<Predicate> getPreconditions();
+public interface PlanAction<T> extends Predicate{
+
+	List<Predicate> getPreconditions();
 	
 	AndPredicate getEffect();
 
+	List<Action<T>> getPlayerActions();
 	
 	
 

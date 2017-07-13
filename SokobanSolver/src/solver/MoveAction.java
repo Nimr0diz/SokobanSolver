@@ -7,14 +7,18 @@ import search.Action;
 import search.State;
 
 public class MoveAction implements Action<Position2D> {
+	State<Position2D> originalState;
 	State<Position2D> resultState;
 	SolidEntity se;
 	Direction2D direction;
+	int cost;
 	
-	public MoveAction(SolidEntity se,Direction2D direction) {
+	public MoveAction(State<Position2D> originalState,SolidEntity se,Direction2D direction) {
+		this.originalState = originalState;
 		this.se = se;
 		this.direction = direction;
 		resultState = null;
+		cost = 1;
 	}
 	@Override
 	public State<Position2D> getResultState() {
@@ -23,12 +27,15 @@ public class MoveAction implements Action<Position2D> {
 
 	@Override
 	public void preformAction(State<Position2D> s) {
-		Position2D newPos  = s.getState();
+		Position2D newPos  = new Position2D(originalState.getState());
 		se.getPolicy().getMovement().move(newPos,direction);
 		resultState = new State<Position2D>(newPos);
-		resultState.setCameFrom(s);
+		resultState.setCameFrom(originalState);
 		resultState.setActionCameFrom(this);
-		resultState.setCost(s.getCost()+getCost());
+		resultState.setCost(originalState.getCost()+getCost());
+		if(s.getActionCameFrom()!=null)
+			if(((MoveAction)s.getActionCameFrom()).getDirection()!=direction)
+				cost=3;
 		
 	}
 
@@ -39,7 +46,7 @@ public class MoveAction implements Action<Position2D> {
 
 	@Override
 	public double getCost() {
-		return 1;
+		return cost;
 	}
 	
 	@Override
@@ -48,16 +55,15 @@ public class MoveAction implements Action<Position2D> {
 		
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		return direction==((MoveAction)obj).direction;
-	}
-	
-	public SolidEntity getSe() {
+	public SolidEntity getEntity() {
 		return se;
 	}
 	public Direction2D getDirection() {
 		return direction;
+	}
+	@Override
+	public State<Position2D> getOriginalState() {
+		return originalState;
 	}
 
 

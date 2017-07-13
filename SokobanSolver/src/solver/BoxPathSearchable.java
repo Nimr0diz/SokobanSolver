@@ -19,21 +19,24 @@ public class BoxPathSearchable extends SokobanSearchable {
 	@Override
 	public List<State<Position2D>> getAllPossibleStates(State<Position2D> s) {
 		List<State<Position2D>> possibleState = new LinkedList<State<Position2D>>();
+		level.getField().removeSolidEntity(b.getPosition());
 		for(Direction2D dir : Direction2D.values())
 		{
-			Position2D nextPos  = s.getState();
+			Position2D nextPos  = new Position2D(s.getState());
 			b.getPolicy().getMovement().move(nextPos,dir);
 			
-			Position2D prevPos = s.getState();
+			Position2D prevPos = new Position2D(s.getState());
 			b.getPolicy().getMovement().move(prevPos, dir.getOppositeDirection());
 			
 			if(level.getSolidEntity(nextPos)==null && level.getSolidEntity(prevPos)==null)
 			{
-				MoveAction action = new MoveAction(b, dir);
+				MoveAction action = new MoveAction(s,b, dir);
 				action.preformAction(s);
+
 				possibleState.add(action.getResultState());
 			}
 		}
+		level.addEntity(b);
 		return possibleState;
 	}
 

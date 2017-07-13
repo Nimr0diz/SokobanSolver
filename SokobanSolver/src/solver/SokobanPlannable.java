@@ -23,6 +23,7 @@ public class SokobanPlannable implements Plannable<SolidEntity> {
 	
 	public SokobanPlannable(Level level) {
 		this.level = level;
+		initSokobanPlannable();
 	}
 	
 	public void initSokobanPlannable() {

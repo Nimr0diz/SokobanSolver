@@ -4,7 +4,7 @@ package plan;
 public class NotPredicate extends CommonPredicate implements Predicate {
 
 	public NotPredicate(Predicate p) {
-		super();
+		super(1);
 		params[0] = p;
 		
 	}

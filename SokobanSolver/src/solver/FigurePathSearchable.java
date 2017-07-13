@@ -22,11 +22,11 @@ public class FigurePathSearchable extends SokobanSearchable {
 		List<State<Position2D>> possibleState = new LinkedList<State<Position2D>>();
 		for(Direction2D dir : Direction2D.values())
 		{
-			Position2D newPos  = s.getState();
+			Position2D newPos  = new Position2D(s.getState());
 			f.getPolicy().getMovement().move(newPos,dir);
 			if(level.getSolidEntity(newPos)==null)
 			{
-				MoveAction action = new MoveAction(f, dir);
+				MoveAction action = new MoveAction(s,f, dir);
 				action.preformAction(s);
 				possibleState.add(action.getResultState());
 			}

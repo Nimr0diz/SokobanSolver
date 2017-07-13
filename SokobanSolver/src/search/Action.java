@@ -6,5 +6,6 @@ public interface Action<T> {
 	void preformAction(State<T> s);
 	boolean isValidate(State<T> s);
 	double getCost();
+	State<T> getOriginalState();
 	
 }
